@@ -1,0 +1,50 @@
+import threading, time, random
+from threading import Semaphore
+
+global S
+
+liste = [0, 1, 2, 3, 4, 5]
+N = 4
+S = Semaphore()
+
+
+class SimpleThread(threading.Thread):
+
+    def __init__(self, name, role):
+        super().__init__()
+        self.name = name
+        self.role = role
+
+    def run(self):
+
+        if self.role == 'add':
+            self.add()
+        else:
+            self.delete()
+
+    def add(self):
+        S.acquire()
+        num = random.randint(0, 9)
+        liste.append(num)
+        print(liste)
+        time.sleep(0.5)
+        S.release()
+
+    def delete(self):
+        S.acquire()
+        del liste[5]
+        print(liste)
+        time.sleep(0.5)
+        S.release()
+
+T1 = [SimpleThread("Thread {}".format(i), role='add') for i in range(N)]
+T2 = [SimpleThread("Thread {}".format(j), role='delete') for j in range(N)]
+
+for i, j in zip(T1, T2):
+    i.start()
+    j.start()
+    time.sleep(0.1)
+
+for i, j in zip(T1, T2):
+    i.join()
+    j.join()
