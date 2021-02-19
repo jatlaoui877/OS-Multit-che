@@ -1,0 +1,42 @@
+from threading import Thread, Lock, Event
+from queue import Queue
+import time, random
+
+
+Q = Queue(10)
+E = Event()
+
+def add(q,S):
+    while True:
+        S.acquire()
+        while not q.full():
+            nombre = random.randint(0, 5)
+            q.put(nombre)
+            time.sleep(0.5)
+        S.release()
+
+def delete(q,S):
+    while True:
+        S.acquire()
+        while not q.empty():
+            q.get()
+            time.sleep(0.5)
+        S.release()
+
+S = Lock()
+
+T1 = Thread(target=add, args=(Q,S ))
+T2 = Thread(target=delete, args=(Q,S ))
+T1.start()
+T2.start()
+
+while True:
+    try:
+        print(Q.queue)
+        time.sleep(1)
+    except KeyboardInterrupt:
+        E.set()
+        break
+
+T1.join()
+T2.join()
