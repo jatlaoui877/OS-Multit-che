@@ -1,0 +1,35 @@
+import threading
+import time
+from string import ascii_letters
+from queue import Queue
+global Qletters
+
+E = threading.Event()
+Q = Queue()
+Q.put('Fichier1_TP5.txt')
+Q.put('Fichier2_TP5.txt')
+Q.put('Fichier3_TP5.txt')
+
+Q2 = []
+
+def func(str, q):
+    if Q.empty():
+        E.set()
+    with open(str) as f:
+        a = sum(1 for line in f
+               for letter in line.lower()
+               if letter in ascii_letters)
+
+    q.append(a)
+    time.sleep(0.5)
+
+T = [threading.Thread(target=func, args=(Q.get(), Q2)) for i in range(3)]
+
+for t in T:
+    t.start()
+
+for t in T:
+    t.join()
+
+if E.is_set():
+    print(sum(Q2))
