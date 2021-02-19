@@ -1,0 +1,65 @@
+class Achat:
+
+    def __init__(self, code_achat, reference, designation, marque, famille, quantite, mini, a_cmd):
+
+    self.code_achat = code_achat
+    self.reference = reference
+    self.designation = designation
+    self.marque = marque
+    self.famille = famille
+    self.quantite = quantite
+    self.mini = mini
+    self.a_cmd = a_cmd
+    self.art = [self.code_achat, self.reference, self.designation, self.marque, self.famille, self.quantite, self.mini, self.a_cmd]
+ 
+  def __str__(self):
+    
+    str_achat = list(self.art)
+    
+    c = 0
+    for x in str_achat: 
+       
+        str_achat[c] = str(x)
+         c+=1
+            txt = " - ".join(str_achat)
+    return txt
+ 
+    def ajouter_bdd(self):
+    
+    conn = sqlite3.connect(fichierBDD)
+     cur = conn.cursor()
+    data = [(self.code_achat, self.reference, self.designation, self.marque, self.famille, self.quantite, self.mini, self.a_cmd)]
+      for tu in data:
+        cur.execute("INSERT les info d'achat(code_achat, reference, designation, marque, famille, quantite, mini, a_cmd) VALUES(?,?,?,?,?,?,?,?)", tu)
+        conn.commit()
+        cur.close()
+        conn.close()
+def creer_bdd():
+    """permet de créer la base de donnée des achat avec :
+        code_achat, reference, designation, marque, famille, quantite, mini, a_cmd """
+    conn = sqlite3.connect(fichierBDD)
+    cur = conn.cursor()
+    cur.execute("CREATE TABLE d'achat(code_achat TEXT, reference TEXT, designation TEXT, marque TEXT, famille TEXT, quantite INTEGER, mini INTEGER, a_cmd INTEGER)")
+    conn.commit()
+    cur.close()
+    conn.close()
+ 
+ def list_bdd():
+    """fonction permettant de mettre la BDD dans une liste"""
+    conn =sqlite3.connect(fichierBDD)
+    cur =conn.cursor() 
+    cur.execute("SELECT * FROM achat")
+    lst = list(cur)
+    cur.close()
+    conn.close()
+    return lst
+ 
+def recherche_achat(codeachat):
+    conn =sqlite3.connect(fichierBDD)
+    cur =conn.cursor() 
+    t = (codeachat,)
+    cur.execute("SELECT * FROM achat where code_achat = ?", t)
+    a = list(cur)
+    cur.close()
+    conn.close()
+    return a[0]
